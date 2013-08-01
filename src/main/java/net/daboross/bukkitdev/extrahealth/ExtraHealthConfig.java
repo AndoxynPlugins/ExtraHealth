@@ -57,8 +57,8 @@ public class ExtraHealthConfig {
             return;
         }
         ConfigurationSection permissions = config.getConfigurationSection("permissions");
-        for (String key : permissions.getKeys(true)) {
-            System.out.println("key:" + config.getInt("permissions|" + key));
+        for (String permissionKey : permissions.getKeys(true)) {
+            permissionsMap.put(permissionKey, config.getInt("permissions|" + permissionKey));
         }
     }
 

@@ -18,13 +18,17 @@ package net.daboross.bukkitdev.extrahealth;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.mcstats.MetricsLite;
 
 /**
@@ -64,7 +68,37 @@ public class ExtraHealthPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent evt) {
-        for (Map.Entry<String, Integer> permission : config.getPermissionsMap().entrySet()) {
+        Player p = evt.getPlayer();
+        int maxBoost = 0;
+        for (Map.Entry<String, Integer> permissionEntry : config.getPermissionsMap().entrySet()) {
+            int boost = permissionEntry.getValue();
+            if (boost > maxBoost && p.hasPermission(permissionEntry.getKey())) {
+                maxBoost = boost;
+            }
         }
+        double newMaxHealth = 20 + maxBoost;
+        getLogger().log(Level.FINE, "Setting max health of player {0} to {1}", new Object[]{p.getName(), newMaxHealth});
+        p.setMaxHealth(newMaxHealth);
+    }
+
+    @EventHandler
+    public void onWorldChange(final PlayerChangedWorldEvent evt) {
+        // Do this one tick later so that permissions plugin can adjust.
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Player p = evt.getPlayer();
+                int maxBoost = 0;
+                for (Map.Entry<String, Integer> permissionEntry : config.getPermissionsMap().entrySet()) {
+                    int boost = permissionEntry.getValue();
+                    if (boost > maxBoost && p.hasPermission(permissionEntry.getKey())) {
+                        maxBoost = boost;
+                    }
+                }
+                double newMaxHealth = 20 + maxBoost;
+                getLogger().log(Level.FINE, "Setting max health of player {0} to {1}", new Object[]{p.getName(), newMaxHealth});
+                p.setMaxHealth(newMaxHealth);
+            }
+        }.runTask(this);
     }
 }
