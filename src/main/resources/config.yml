@@ -1,0 +1,15 @@
+# Add your own permissions to the following list.
+# in the form of 'permission: <extrahealth>'
+# When a player has one of these permissions, the will be given <extrahealth>
+# extra health.
+permissions:
+  extrahealth.1: 1
+  extrahealth.2: 2
+  extrahealth.3: 3
+  extrahealth.4: 4
+  extrahealth.5: 5
+  extrahealth.6: 6
+  extrahealth.7: 7
+  extrahealth.8: 8
+  extrahealth.9: 9
+  extrahealth.10: 10

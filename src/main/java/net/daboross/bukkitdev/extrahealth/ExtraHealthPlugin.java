@@ -16,11 +16,16 @@
  */
 package net.daboross.bukkitdev.extrahealth;
 
+import java.io.IOException;
+import java.util.Map;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.MetricsLite;
 
 /**
  *
@@ -28,10 +33,23 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ExtraHealthPlugin extends JavaPlugin implements Listener {
 
+    private ExtraHealthConfig config;
+
     @Override
     public void onEnable() {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
+        MetricsLite metrics = null;
+        try {
+            metrics = new MetricsLite(this);
+        } catch (IOException ex) {
+            getLogger().warning("Unable to create Metrics");
+        }
+        if (metrics != null) {
+            metrics.start();
+        }
+        config = new ExtraHealthConfig(this);
+        config.reloadConfig();
     }
 
     @Override
@@ -40,10 +58,13 @@ public class ExtraHealthPlugin extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("")) {
-        } else {
-            sender.sendMessage("ExtraHealth doesn't know about the command /" + cmd.getName());
-        }
+        sender.sendMessage("ExtraHealth doesn't know about the command /" + cmd.getName());
         return true;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent evt) {
+        for (Map.Entry<String, Integer> permission : config.getPermissionsMap().entrySet()) {
+        }
     }
 }
