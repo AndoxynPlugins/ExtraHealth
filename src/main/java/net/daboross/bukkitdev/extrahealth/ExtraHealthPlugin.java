@@ -68,17 +68,7 @@ public class ExtraHealthPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent evt) {
-        Player p = evt.getPlayer();
-        int maxBoost = 0;
-        for (Map.Entry<String, Integer> permissionEntry : config.getPermissionsMap().entrySet()) {
-            int boost = permissionEntry.getValue();
-            if (boost > maxBoost && p.hasPermission(permissionEntry.getKey())) {
-                maxBoost = boost;
-            }
-        }
-        double newMaxHealth = 20 + maxBoost;
-        getLogger().log(Level.FINE, "Setting max health of player {0} to {1}", new Object[]{p.getName(), newMaxHealth});
-        p.setMaxHealth(newMaxHealth);
+        boostHealth(evt.getPlayer());
     }
 
     @EventHandler
@@ -88,17 +78,23 @@ public class ExtraHealthPlugin extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 Player p = evt.getPlayer();
-                int maxBoost = 0;
-                for (Map.Entry<String, Integer> permissionEntry : config.getPermissionsMap().entrySet()) {
-                    int boost = permissionEntry.getValue();
-                    if (boost > maxBoost && p.hasPermission(permissionEntry.getKey())) {
-                        maxBoost = boost;
-                    }
+                if (p.isOnline()) {// Make sure the player is still online.
+                    boostHealth(p);
                 }
-                double newMaxHealth = 20 + maxBoost;
-                getLogger().log(Level.FINE, "Setting max health of player {0} to {1}", new Object[]{p.getName(), newMaxHealth});
-                p.setMaxHealth(newMaxHealth);
             }
         }.runTask(this);
+    }
+
+    private void boostHealth(Player p) {
+        double maxBoost = 0;
+        for (Map.Entry<String, Double> permissionEntry : config.getPermissionsMap().entrySet()) {
+            double boost = permissionEntry.getValue();
+            if (boost > maxBoost && p.hasPermission(permissionEntry.getKey())) {
+                maxBoost = boost;
+            }
+        }
+        double newMaxHealth = 20 + maxBoost * 2;
+        getLogger().log(Level.FINE, "Setting max health of player {0} to {1}", new Object[]{p.getName(), newMaxHealth});
+        p.setMaxHealth(newMaxHealth);
     }
 }

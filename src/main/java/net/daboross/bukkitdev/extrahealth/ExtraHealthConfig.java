@@ -23,7 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ExtraHealthConfig {
 
     private final JavaPlugin plugin;
-    private final Map<String, Integer> permissionsMap = new HashMap<String, Integer>();
+    private final Map<String, Double> permissionsMap = new HashMap<String, Double>();
     private File configFile;
     private FileConfiguration config;
 
@@ -58,11 +58,11 @@ public class ExtraHealthConfig {
         }
         ConfigurationSection permissions = config.getConfigurationSection("permissions");
         for (String permissionKey : permissions.getKeys(true)) {
-            permissionsMap.put(permissionKey, config.getInt("permissions|" + permissionKey));
+            permissionsMap.put(permissionKey, config.getDouble("permissions|" + permissionKey));
         }
     }
 
-    public Map<String, Integer> getPermissionsMap() {
+    public Map<String, Double> getPermissionsMap() {
         if (config == null) {
             reloadConfig();
         }
